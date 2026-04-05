@@ -1,0 +1,24 @@
+{
+  "name": "info1_interpreter_templates",
+  "description": "情報I対応ブラウザインタプリタ用のテンプレート駆動型ハーネス md 一式",
+  "files": [
+    "README.md",
+    "00_master_instruction.md",
+    "01_scope_and_conformance_matrix.md",
+    "02_monaco_editor_workbench.md",
+    "03_language_subset_and_syntax.md",
+    "04_tokenizer_and_parser.md",
+    "05_runtime_and_evaluator.md",
+    "06_io_and_stdout.md",
+    "07_control_flow.md",
+    "08_lists_random_functions.md",
+    "09_webapi_and_browser_sandbox.md",
+    "10_device_simulation.md",
+    "11_algorithms_and_reference_programs.md",
+    "12_precision_and_numeric_errors.md",
+    "13_modeling_and_simulation.md",
+    "14_integration_packaging.md",
+    "15_trace_tests_and_examples.md",
+    "99_template_to_boilerplate.md"
+  ]
+}
