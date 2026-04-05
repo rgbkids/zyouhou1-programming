@@ -1,8 +1,8 @@
 // Progress dashboard — topic accuracy heatmap, streak, recent mistakes
 
 import { useMemo } from 'react';
-import type { HistoryStore } from './historySchema';
 import { resetHistory, exportHistory } from './localStorageRepo';
+import { useHistoryStore } from './historyStore';
 
 const TOPIC_LABELS: Record<string, string> = {
   variables: '変数', operators: '演算子', branch: '分岐',
@@ -22,12 +22,9 @@ function HeatCell({ pct, label }: { pct: number; label: string }) {
   );
 }
 
-interface Props {
-  store: HistoryStore;
-  onRefresh: () => void;
-}
+export function ProgressDashboard() {
+  const { store, refresh } = useHistoryStore();
 
-export function ProgressDashboard({ store, onRefresh }: Props) {
   const topicRows = useMemo(() => {
     return Object.entries(TOPIC_LABELS).map(([key, label]) => {
       const ts = store.topicStats[key];
@@ -56,7 +53,7 @@ export function ProgressDashboard({ store, onRefresh }: Props) {
   function handleReset() {
     if (confirm('学習履歴をすべてリセットしますか？')) {
       resetHistory();
-      onRefresh();
+      refresh();
     }
   }
 
