@@ -152,7 +152,7 @@ export function AITeacherPanel({ currentCode, currentProblem, lastError, topicTa
   }
 
   function handleKey(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
       void send();
     }
@@ -202,7 +202,7 @@ export function AITeacherPanel({ currentCode, currentProblem, lastError, topicTa
             <textarea
               className="input-field textarea-field"
               rows={2}
-              placeholder="質問を入力… (Enter で送信)"
+              placeholder="質問を入力… (Cmd+Enter で送信)"
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKey}
