@@ -8,10 +8,13 @@ import type { ExamSession } from './examSchema';
 import { ProblemRenderer } from '../practice/problemRenderer';
 import { useHistoryStore } from '../history/historyStore';
 
-const btn = (primary?: boolean) => ({
-  padding: '6px 16px', borderRadius: 4, border: 'none', cursor: 'pointer',
-  background: primary ? '#0e639c' : '#3c3c3c', color: '#fff',
-} as const);
+const GRADE_COLORS: Record<string, string> = {
+  S: 'var(--accent)',
+  A: 'var(--teal)',
+  B: 'var(--amber)',
+  C: 'var(--blue)',
+  D: 'var(--red)',
+};
 
 export function AbilityTestSession({ onClose }: { onClose: () => void }) {
   const { recordAnswer } = useHistoryStore();
@@ -52,73 +55,87 @@ export function AbilityTestSession({ onClose }: { onClose: () => void }) {
     }
   }
 
-  // Start screen
+  // ── Start screen ──────────────────────────────────────────
   if (!session) {
     return (
-      <div style={{ padding: 24, maxWidth: 500, color: '#d4d4d4' }}>
-        <h2 style={{ color: '#9cdcfe', marginTop: 0 }}>実力テスト</h2>
-        <p style={{ color: '#aaa', fontSize: 14 }}>
-          全トピックから5問出題します。結果は学習履歴に記録されます。
-        </p>
-        <div style={{ background: '#252526', borderRadius: 6, padding: 12, marginBottom: 16, fontSize: 13 }}>
-          <div>問題数: <strong>5問</strong></div>
-          <div>構成: 基礎2問 / 標準2問 / 応用1問</div>
+      <div className="panel">
+        <h2 className="panel-title">実力テスト</h2>
+        <div className="card mb-12">
+          <div style={{ color: 'var(--text-2)', fontSize: 13, marginBottom: 12, lineHeight: 1.65 }}>
+            全トピックから5問出題します。結果は学習履歴に記録されます。
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 13 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: 'var(--text)' }}>問題数</span>
+              <span style={{ color: 'var(--text-bright)', fontFamily: 'var(--font-mono)' }}>5問</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ color: 'var(--text)' }}>構成</span>
+              <span style={{ color: 'var(--text-bright)', fontSize: 12 }}>基礎2 / 標準2 / 応用1</span>
+            </div>
+          </div>
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button style={btn(true)} onClick={startExam}>開始する</button>
-          <button style={btn()} onClick={onClose}>戻る</button>
+        <div className="flex-row">
+          <button className="btn btn-primary" onClick={startExam}>開始する</button>
+          <button className="btn btn-secondary" onClick={onClose}>戻る</button>
         </div>
       </div>
     );
   }
 
-  // Result screen
+  // ── Result screen ─────────────────────────────────────────
   if (done) {
     const result = scoreExam(session.problems, session.answers);
-    const gradeColor = { S: '#89d185', A: '#4ec9b0', B: '#dcdcaa', C: '#ce9178', D: '#f48771' }[result.grade];
+    const gradeColor = GRADE_COLORS[result.grade] ?? 'var(--text)';
     return (
-      <div style={{ padding: 24, maxWidth: 560, color: '#d4d4d4' }}>
-        <h2 style={{ color: '#9cdcfe', marginTop: 0 }}>テスト結果</h2>
-        <div style={{ display: 'flex', gap: 16, marginBottom: 16 }}>
-          <div style={{ background: '#252526', borderRadius: 6, padding: 16, textAlign: 'center', flex: 1 }}>
-            <div style={{ fontSize: 48, fontWeight: 'bold', color: gradeColor }}>{result.grade}</div>
-            <div style={{ fontSize: 12, color: '#888' }}>評価</div>
+      <div className="panel">
+        <h2 className="panel-title">テスト結果</h2>
+        <div className="stats-row">
+          <div className="stat-card" style={{ textAlign: 'center' }}>
+            <span className="grade-badge" style={{ color: gradeColor }}>{result.grade}</span>
+            <span className="stat-label mt-8">評価</span>
           </div>
-          <div style={{ background: '#252526', borderRadius: 6, padding: 16, textAlign: 'center', flex: 1 }}>
-            <div style={{ fontSize: 36, fontWeight: 'bold', color: gradeColor }}>{result.score}点</div>
-            <div style={{ fontSize: 12, color: '#888' }}>{result.pass ? '合格' : '不合格'}</div>
+          <div className="stat-card" style={{ textAlign: 'center' }}>
+            <span className="stat-value" style={{ color: gradeColor }}>{result.score}</span>
+            <span className="stat-label">{result.pass ? '✓ 合格' : '✗ 不合格'}</span>
           </div>
         </div>
-        <div style={{ background: '#1a2a3a', border: '1px solid #0e639c', borderRadius: 6, padding: 12, marginBottom: 16, color: '#9cdcfe', fontSize: 13 }}>
+        <div className="feedback-box feedback-box--info mb-12">
           {result.feedback}
         </div>
-        <div style={{ background: '#252526', borderRadius: 6, padding: 12, marginBottom: 16 }}>
-          <div style={{ color: '#888', fontSize: 12, marginBottom: 8 }}>トピック別</div>
+        <div className="card mb-12">
+          <div className="section-heading mb-8">トピック別</div>
           {result.topicBreakdown.map(t => (
-            <div key={t.topic} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 4 }}>
-              <span style={{ color: '#ccc' }}>{t.topic}</span>
-              <span style={{ color: t.correct === t.total ? '#89d185' : '#f48771' }}>{t.correct}/{t.total}</span>
+            <div key={t.topic} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 5 }}>
+              <span style={{ color: 'var(--text-2)' }}>{t.topic}</span>
+              <span style={{ color: t.correct === t.total ? 'var(--accent)' : 'var(--red)', fontFamily: 'var(--font-mono)' }}>
+                {t.correct}/{t.total}
+              </span>
             </div>
           ))}
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button style={btn(true)} onClick={startExam}>もう一度</button>
-          <button style={btn()} onClick={onClose}>終了</button>
+        <div className="flex-row">
+          <button className="btn btn-primary" onClick={startExam}>もう一度</button>
+          <button className="btn btn-secondary" onClick={onClose}>終了</button>
         </div>
       </div>
     );
   }
 
-  // Question screen
+  // ── Question screen ───────────────────────────────────────
   const problem = session.problems[idx];
+  const progress = (idx / session.problems.length) * 100;
   return (
-    <div style={{ padding: 16, maxWidth: 680, color: '#d4d4d4' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-        <span style={{ color: '#888', fontSize: 13 }}>実力テスト {idx + 1} / {session.problems.length}</span>
-        <button onClick={onClose} style={{ ...btn(), fontSize: 12 }}>中断</button>
+    <div className="panel">
+      <div className="progress-bar">
+        <div className="progress-bar__fill" style={{ width: `${progress}%` }} />
+      </div>
+      <div className="session-header">
+        <span className="session-meta">実力テスト {idx + 1} / {session.problems.length}</span>
+        <button className="btn btn-secondary btn-sm" onClick={onClose}>中断</button>
       </div>
       <ProblemRenderer key={problem.id} problem={problem} onAnswer={handleAnswer} />
-      <button style={{ ...btn(true), marginTop: 8 }} onClick={next}>
+      <button className="btn btn-primary mt-8" onClick={next}>
         {idx + 1 >= session.problems.length ? '結果を見る' : '次へ →'}
       </button>
     </div>

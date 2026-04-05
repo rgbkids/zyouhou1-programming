@@ -19,29 +19,6 @@ interface Props {
   topicTag?: string;
 }
 
-const inputStyle: React.CSSProperties = {
-  flex: 1,
-  background: '#3c3c3c',
-  border: '1px solid #555',
-  borderRadius: 4,
-  color: '#d4d4d4',
-  padding: '6px 10px',
-  fontSize: 13,
-  outline: 'none',
-  resize: 'none',
-};
-
-const sendBtn: React.CSSProperties = {
-  background: '#0e639c',
-  color: '#fff',
-  border: 'none',
-  borderRadius: 4,
-  padding: '6px 14px',
-  cursor: 'pointer',
-  fontSize: 13,
-  alignSelf: 'flex-end',
-};
-
 function emotionFromText(text: string): Emotion {
   if (/素晴らしい|よくできまし|完璧|正解/.test(text)) return 'happy';
   if (/エラー|間違|注意|気をつけ/.test(text)) return 'warning';
@@ -80,7 +57,6 @@ export function AITeacherPanel({ currentCode, currentProblem, lastError, topicTa
       topicTag,
     };
 
-    // Placeholder streaming message
     setMessages(prev => [...prev, { role: 'teacher', text: '', streaming: true }]);
 
     let accumulated = '';
@@ -135,47 +111,31 @@ export function AITeacherPanel({ currentCode, currentProblem, lastError, topicTa
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 400, color: '#d4d4d4' }}>
+    <div className="ai-panel">
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: '1px solid #333' }}>
-        <TeacherCharacter emotion={emotion} size={56} />
+      <div className="ai-header">
+        <TeacherCharacter emotion={emotion} size={52} />
         <div>
-          <div style={{ fontWeight: 'bold', color: '#9cdcfe', fontSize: 15 }}>AI先生</div>
-          <div style={{ fontSize: 12, color: '#888' }}>情報I サポートエージェント</div>
+          <div className="ai-header__name">AI先生</div>
+          <div className="ai-header__sub">情報I サポートエージェント</div>
         </div>
-        {busy && (
-          <div style={{ marginLeft: 'auto', fontSize: 12, color: '#4ec9b0' }}>考え中...</div>
-        )}
+        {busy && <div className="ai-header__thinking">考え中…</div>}
       </div>
 
       {/* Messages */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div className="ai-messages">
         {messages.map((msg, i) => (
-          <div
-            key={i}
-            style={{
-              display: 'flex',
-              flexDirection: msg.role === 'user' ? 'row-reverse' : 'row',
-              alignItems: 'flex-start',
-              gap: 8,
-            }}
-          >
-            {msg.role === 'teacher' && <TeacherCharacter emotion={i === messages.length - 1 ? emotion : 'neutral'} size={32} />}
-            <div
-              style={{
-                maxWidth: '80%',
-                background: msg.role === 'user' ? '#0e639c' : '#252526',
-                border: msg.role === 'teacher' ? '1px solid #333' : 'none',
-                borderRadius: 8,
-                padding: '8px 12px',
-                fontSize: 13,
-                lineHeight: 1.6,
-                whiteSpace: 'pre-wrap',
-              }}
-            >
+          <div key={i} className={`ai-msg${msg.role === 'user' ? ' ai-msg--user' : ''}`}>
+            {msg.role === 'teacher' && (
+              <TeacherCharacter
+                emotion={i === messages.length - 1 ? emotion : 'neutral'}
+                size={30}
+              />
+            )}
+            <div className={`ai-bubble ${msg.role === 'teacher' ? 'ai-bubble--teacher' : 'ai-bubble--user'}`}>
               {msg.text}
               {msg.streaming && msg.text === '' && (
-                <span style={{ color: '#555' }}>▋</span>
+                <span className="ai-cursor">▋</span>
               )}
             </div>
           </div>
@@ -184,9 +144,9 @@ export function AITeacherPanel({ currentCode, currentProblem, lastError, topicTa
       </div>
 
       {/* Input */}
-      <div style={{ padding: '10px 16px', borderTop: '1px solid #333', display: 'flex', gap: 8 }}>
+      <div className="ai-input-row">
         <textarea
-          style={inputStyle}
+          className="input-field textarea-field"
           rows={2}
           placeholder="質問を入力… (Enter で送信、Shift+Enter で改行)"
           value={input}
@@ -194,7 +154,11 @@ export function AITeacherPanel({ currentCode, currentProblem, lastError, topicTa
           onKeyDown={handleKey}
           disabled={busy}
         />
-        <button style={sendBtn} onClick={() => void send()} disabled={busy || !input.trim()}>
+        <button
+          className="btn btn-primary btn-sm"
+          onClick={() => void send()}
+          disabled={busy || !input.trim()}
+        >
           送信
         </button>
       </div>

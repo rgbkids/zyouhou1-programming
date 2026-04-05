@@ -9,23 +9,10 @@ interface Props {
   onAnswer: (correct: boolean, usedHint: boolean) => void;
 }
 
-const s = {
-  box: { background: '#252526', borderRadius: 6, padding: 16, marginBottom: 12 } as const,
-  label: { fontSize: 11, color: '#888', marginBottom: 4 } as const,
-  statement: { fontSize: 15, color: '#d4d4d4', marginBottom: 12, lineHeight: 1.6 } as const,
-  code: { background: '#1e1e1e', fontFamily: 'monospace', fontSize: 13, padding: 10, borderRadius: 4, whiteSpace: 'pre', overflowX: 'auto', marginBottom: 12, color: '#ce9178' } as const,
-  btn: (primary?: boolean) => ({
-    padding: '6px 14px', borderRadius: 4, border: 'none', cursor: 'pointer',
-    background: primary ? '#0e639c' : '#3c3c3c', color: '#fff', marginRight: 8,
-  } as const),
-  choiceBtn: (selected: boolean, correct?: boolean) => ({
-    display: 'block', width: '100%', textAlign: 'left' as const,
-    padding: '8px 12px', marginBottom: 6, borderRadius: 4, border: '1px solid',
-    borderColor: selected ? (correct ? '#89d185' : '#f48771') : '#555',
-    background: selected ? (correct ? '#1a3a1a' : '#3a1a1a') : '#2d2d2d',
-    color: '#d4d4d4', cursor: 'pointer', fontSize: 14,
-  }),
-  explanation: { background: '#1a2a1a', border: '1px solid #3a5a3a', borderRadius: 4, padding: 10, color: '#89d185', fontSize: 13, lineHeight: 1.6 } as const,
+const DIFFICULTY_LABEL: Record<string, string> = {
+  basic: '基礎',
+  standard: '標準',
+  advanced: '応用',
 };
 
 export function ProblemRenderer({ problem, onAnswer }: Props) {
@@ -63,39 +50,51 @@ export function ProblemRenderer({ problem, onAnswer }: Props) {
 
   function checkFixCode() {
     if (answered) return;
-    // Simple check: run or accept any non-empty diff — in full impl, run through evaluator
     submit(monacoCode.trim() !== (problem.code ?? '').trim());
+  }
+
+  function choiceClass(choiceId: string, isCorrect: boolean) {
+    if (selected !== choiceId) return 'choice-btn';
+    return `choice-btn ${isCorrect ? 'choice-btn--correct' : 'choice-btn--wrong'}`;
   }
 
   return (
     <div>
       {/* Problem header */}
-      <div style={s.box}>
-        <div style={s.label}>
-          {problem.difficulty === 'basic' ? '基礎' : problem.difficulty === 'standard' ? '標準' : '応用'} ／{' '}
-          {problem.topics.join(', ')}
+      <div className="card">
+        <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
+          <span className="badge badge--blue">
+            {DIFFICULTY_LABEL[problem.difficulty] ?? problem.difficulty}
+          </span>
+          {problem.topics.map(t => (
+            <span key={t} className="badge badge--violet">{t}</span>
+          ))}
         </div>
-        <div style={{ fontSize: 16, fontWeight: 'bold', color: '#9cdcfe', marginBottom: 8 }}>{problem.title}</div>
-        <div style={s.statement}>{problem.statement}</div>
-        {problem.code && <div style={s.code}>{problem.code}</div>}
-        <button style={s.btn()} onClick={() => setShowHint(h => !h)}>
-          {showHint ? 'ヒントを隠す' : 'ヒントを見る'}
+        <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-bright)', marginBottom: 10 }}>
+          {problem.title}
+        </div>
+        <div style={{ fontSize: 13, color: 'var(--text-2)', lineHeight: 1.7, marginBottom: 10 }}>
+          {problem.statement}
+        </div>
+        {problem.code && <div className="code-display">{problem.code}</div>}
+        <button className="btn btn-secondary btn-sm" onClick={() => setShowHint(h => !h)}>
+          {showHint ? 'ヒントを隠す' : '💡 ヒントを見る'}
         </button>
         {showHint && (
-          <div style={{ marginTop: 8, color: '#dcdcaa', fontSize: 13 }}>
-            💡 {problem.relatedTopics?.join(', ')} の知識を使います。
+          <div className="feedback-box feedback-box--warning mt-8">
+            {problem.relatedTopics?.join(', ')} の知識を使います。
           </div>
         )}
       </div>
 
       {/* Answer area */}
-      <div style={s.box}>
+      <div className="card">
         {problem.type === 'multiple-choice' && (
           <>
             {problem.choices?.map(choice => (
               <button
                 key={choice.id}
-                style={s.choiceBtn(selected === choice.id, choice.isCorrect)}
+                className={choiceClass(choice.id, choice.isCorrect)}
                 onClick={() => checkMultipleChoice(choice.id)}
                 disabled={answered}
               >
@@ -108,13 +107,17 @@ export function ProblemRenderer({ problem, onAnswer }: Props) {
         {(problem.type === 'fill-blank' || problem.type === 'predict-output') && (
           <div>
             <input
+              className="input-field"
               value={input}
               onChange={e => setInput(e.target.value)}
               placeholder="答えを入力..."
               disabled={answered}
-              style={{ width: '100%', padding: 8, background: '#1e1e1e', border: '1px solid #555', color: '#d4d4d4', borderRadius: 4, fontSize: 14, boxSizing: 'border-box' }}
             />
-            <button style={{ ...s.btn(true), marginTop: 8 }} onClick={problem.type === 'fill-blank' ? checkFillBlank : checkPredictOutput} disabled={answered}>
+            <button
+              className="btn btn-primary mt-8"
+              onClick={problem.type === 'fill-blank' ? checkFillBlank : checkPredictOutput}
+              disabled={answered}
+            >
               回答する
             </button>
           </div>
@@ -124,22 +127,22 @@ export function ProblemRenderer({ problem, onAnswer }: Props) {
           <div>
             {problem.usesMonaco ? (
               <>
-                <div style={s.label}>コードを修正してください</div>
+                <div className="section-heading mb-8">コードを修正してください</div>
                 <MonacoWorkbench code={monacoCode} onChange={setMonacoCode} height="180px" />
-                <button style={{ ...s.btn(true), marginTop: 8 }} onClick={checkFixCode} disabled={answered}>
+                <button className="btn btn-primary mt-8" onClick={checkFixCode} disabled={answered}>
                   提出する
                 </button>
               </>
             ) : (
               <div>
                 <input
+                  className="input-field"
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   placeholder="出力を入力..."
                   disabled={answered}
-                  style={{ width: '100%', padding: 8, background: '#1e1e1e', border: '1px solid #555', color: '#d4d4d4', borderRadius: 4, fontSize: 14, boxSizing: 'border-box' }}
                 />
-                <button style={{ ...s.btn(true), marginTop: 8 }} onClick={checkPredictOutput} disabled={answered}>
+                <button className="btn btn-primary mt-8" onClick={checkPredictOutput} disabled={answered}>
                   回答する
                 </button>
               </div>
@@ -150,13 +153,20 @@ export function ProblemRenderer({ problem, onAnswer }: Props) {
 
       {/* Result + explanation */}
       {answered && (
-        <div style={s.box}>
-          <div style={{ fontSize: 16, fontWeight: 'bold', color: correct ? '#89d185' : '#f48771', marginBottom: 8 }}>
+        <div className="card">
+          <div style={{
+            fontSize: 15,
+            fontWeight: 700,
+            color: correct ? 'var(--accent)' : 'var(--red)',
+            marginBottom: 10,
+          }}>
             {correct ? '✓ 正解！' : '✗ 不正解'}
           </div>
-          <div style={s.explanation}>{problem.explanation}</div>
+          <div className={`feedback-box ${correct ? 'feedback-box--success' : 'feedback-box--error'}`}>
+            {problem.explanation}
+          </div>
           {!correct && problem.wrongReasons && (
-            <div style={{ marginTop: 8, color: '#f48771', fontSize: 12 }}>
+            <div style={{ marginTop: 8, color: 'var(--amber)', fontSize: 12 }}>
               よくある間違い: {problem.wrongReasons.join(' / ')}
             </div>
           )}

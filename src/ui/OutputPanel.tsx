@@ -6,17 +6,17 @@ interface Props {
 
 export function OutputPanel({ buffer }: Props) {
   return (
-    <div style={{ fontFamily: 'monospace', fontSize: 14, background: '#1e1e1e', color: '#d4d4d4', padding: 12, minHeight: 120, overflowY: 'auto', borderRadius: 4 }}>
+    <div className="output-panel">
       {buffer.lines.map((line, i) => (
-        <div key={i}>{line}</div>
+        <div key={i} className="output-line">{line}</div>
       ))}
       {buffer.errors.map((err, i) => (
-        <div key={`e${i}`} style={{ color: '#f48771' }}>
+        <div key={`e${i}`} className="output-error">
           {err.line ? `[Line ${err.line}] ` : ''}{err.message}
         </div>
       ))}
       {buffer.lines.length === 0 && buffer.errors.length === 0 && (
-        <div style={{ color: '#555' }}>（出力なし）</div>
+        <div className="output-empty">（出力なし）</div>
       )}
     </div>
   );

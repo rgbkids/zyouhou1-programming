@@ -15,17 +15,25 @@ export function ReviewSession({ onClose }: { onClose: () => void }) {
 
   if (queue.length === 0) {
     return (
-      <div style={{ padding: 24, color: '#d4d4d4' }}>
-        <h2 style={{ color: '#9cdcfe', marginTop: 0 }}>復習</h2>
-        <p>復習する問題がありません。まず練習問題を解いてみましょう。</p>
-        <button onClick={onClose} style={{ padding: '6px 14px', background: '#0e639c', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' }}>戻る</button>
+      <div className="panel">
+        <h2 className="panel-title">復習</h2>
+        <div className="feedback-box feedback-box--info mb-16">
+          復習する問題がありません。まず練習問題を解いてみましょう。
+        </div>
+        <button className="btn btn-secondary" onClick={onClose}>戻る</button>
       </div>
     );
   }
 
   function handleAnswer(correct: boolean, usedHint: boolean) {
     const { problem } = queue[idx];
-    recordAnswer({ problemId: problem.id, topic: problem.topics[0], correct, durationMs: Date.now() - startTime.current, usedHint });
+    recordAnswer({
+      problemId: problem.id,
+      topic: problem.topics[0],
+      correct,
+      durationMs: Date.now() - startTime.current,
+      usedHint,
+    });
     setScore(s => ({ correct: s.correct + (correct ? 1 : 0), total: s.total + 1 }));
     startTime.current = Date.now();
   }
@@ -34,35 +42,45 @@ export function ReviewSession({ onClose }: { onClose: () => void }) {
     idx + 1 >= queue.length ? setDone(true) : setIdx(i => i + 1);
   }
 
-  const btn = { padding: '6px 14px', background: '#0e639c', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer' };
-
+  // ── Result screen ─────────────────────────────────────────
   if (done) {
     const pct = Math.round(score.correct / score.total * 100);
+    const cls = pct >= 80 ? 'good' : pct >= 50 ? 'mid' : 'bad';
     return (
-      <div style={{ padding: 24, color: '#d4d4d4' }}>
-        <h2 style={{ color: '#9cdcfe', marginTop: 0 }}>復習完了</h2>
-        <div style={{ fontSize: 28, fontWeight: 'bold', color: pct >= 80 ? '#89d185' : '#f48771' }}>{score.correct}/{score.total} 正解 ({pct}%)</div>
-        <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
-          <button style={btn} onClick={onClose}>終了</button>
+      <div className="panel">
+        <h2 className="panel-title">復習完了</h2>
+        <div className="card" style={{ textAlign: 'center', padding: '28px 20px' }}>
+          <div className={`score-display score-display--${cls}`}>
+            {score.correct} <span style={{ fontSize: '0.5em', opacity: 0.6 }}>/ {score.total}</span>
+          </div>
+          <div style={{ fontSize: 13, color: 'var(--text)', marginTop: 6 }}>
+            正解率 {pct}%
+          </div>
+        </div>
+        <div className="flex-row mt-12">
+          <button className="btn btn-secondary" onClick={onClose}>終了</button>
         </div>
       </div>
     );
   }
 
+  // ── In-progress screen ────────────────────────────────────
   const { problem, reason } = queue[idx];
+  const progress = (idx / queue.length) * 100;
   return (
-    <div style={{ padding: 16, maxWidth: 680, color: '#d4d4d4' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-        <div>
-          <span style={{ color: '#888', fontSize: 12 }}>復習 {idx + 1}/{queue.length}</span>
-          <span style={{ marginLeft: 10, fontSize: 11, background: '#3a2a00', color: '#dcdcaa', padding: '2px 8px', borderRadius: 10 }}>
-            {reason}
-          </span>
+    <div className="panel">
+      <div className="progress-bar">
+        <div className="progress-bar__fill" style={{ width: `${progress}%` }} />
+      </div>
+      <div className="session-header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span className="session-meta">復習 {idx + 1}/{queue.length}</span>
+          <span className="badge badge--amber">{reason}</span>
         </div>
-        <button onClick={onClose} style={{ ...btn, background: '#3c3c3c', color: '#ccc', fontSize: 12 }}>中断</button>
+        <button className="btn btn-secondary btn-sm" onClick={onClose}>中断</button>
       </div>
       <ProblemRenderer key={problem.id} problem={problem} onAnswer={handleAnswer} />
-      <button style={{ ...btn, marginTop: 8 }} onClick={next}>
+      <button className="btn btn-primary mt-8" onClick={next}>
         {idx + 1 >= queue.length ? '結果を見る' : '次へ →'}
       </button>
     </div>

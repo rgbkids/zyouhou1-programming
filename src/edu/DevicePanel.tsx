@@ -10,33 +10,26 @@ function Slider({ label, value, min, max, onChange }: {
   onChange: (v: number) => void;
 }) {
   return (
-    <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12 }}>
-      <span style={{ width: 130, color: '#ccc' }}>{label}</span>
+    <div className="device-slider-row">
+      <span className="device-slider-label">{label}</span>
       <input
         type="range" min={min} max={max} value={value}
         onChange={e => onChange(Number(e.target.value))}
-        style={{ flex: 1 }}
+        style={{ flex: 1, accentColor: 'var(--accent)' }}
       />
-      <span style={{ width: 40, color: '#aaa', textAlign: 'right' }}>{value}</span>
-    </label>
+      <span className="device-slider-value">{value}</span>
+    </div>
   );
 }
 
 export function DevicePanel({ state, onChange }: Props) {
   return (
-    <div style={{ background: '#252526', padding: 12, borderRadius: 4, fontSize: 12 }}>
-      <div style={{ color: '#9cdcfe', marginBottom: 8, fontWeight: 'bold' }}>デバイスシミュレータ</div>
+    <div className="device-panel">
+      <div className="section-heading mb-8">デバイスシミュレータ</div>
 
       {/* LED Display */}
-      <div style={{ marginBottom: 12 }}>
-        <div style={{ color: '#888', marginBottom: 4 }}>LED 表示</div>
-        <div style={{
-          background: '#000', color: '#0f0', fontFamily: 'monospace',
-          fontSize: 24, textAlign: 'center', padding: '8px 16px',
-          borderRadius: 4, minHeight: 40, letterSpacing: 4,
-        }}>
-          {state.ledText || ' '}
-        </div>
+      <div className="device-led">
+        {state.ledText || '\u00a0'}
       </div>
 
       {/* Sensors */}
@@ -49,9 +42,9 @@ export function DevicePanel({ state, onChange }: Props) {
       <Slider label="光センサ" value={state.light} min={0} max={1023}
         onChange={v => onChange({ light: v })} />
 
-      {/* Motor */}
-      <div style={{ marginTop: 8, color: '#888' }}>
-        モーター速度: <span style={{ color: '#4ec9b0' }}>{state.motorSpeed}</span>
+      <div style={{ marginTop: 10, display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
+        <span style={{ color: 'var(--text)' }}>モーター速度</span>
+        <span style={{ color: 'var(--accent)', fontFamily: 'var(--font-mono)' }}>{state.motorSpeed}</span>
       </div>
     </div>
   );

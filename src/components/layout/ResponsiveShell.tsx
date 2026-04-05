@@ -1,9 +1,11 @@
 // Responsive shell layout component
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { Panel, Group as PanelGroup, type PanelImperativeHandle } from 'react-resizable-panels';
 import { MobileTabs } from './MobileTabs';
 import type { TabId } from './MobileTabs';
 import { BottomSheet } from './BottomSheet';
+import { ResizeHandle } from './ResizeHandle';
 
 interface ShellProps {
   /** Header content (logo, run button) */
@@ -19,6 +21,14 @@ interface ShellProps {
 export function ResponsiveShell({ header, sidebar, main, panels }: ShellProps) {
   const [activeTab, setActiveTab] = useState<TabId>('editor');
   const [sheetOpen, setSheetOpen] = useState(false);
+  const sidebarPanelRef = useRef<PanelImperativeHandle>(null);
+
+  // Collapse sidebar on mobile so PanelGroup doesn't allocate space for it
+  useEffect(() => {
+    if (window.innerWidth <= 768) {
+      sidebarPanelRef.current?.collapse();
+    }
+  }, []);
 
   function handleTabChange(tab: TabId) {
     setActiveTab(tab);
@@ -37,13 +47,25 @@ export function ResponsiveShell({ header, sidebar, main, panels }: ShellProps) {
         {header}
       </header>
 
-      <aside className="shell__sidebar desktop-only">
-        {sidebar}
-      </aside>
-
-      <main className="shell__main">
-        {main}
-      </main>
+      <div className="shell__body">
+        <PanelGroup orientation="horizontal">
+          <Panel
+            panelRef={sidebarPanelRef}
+            defaultSize="20%"
+            minSize="12%"
+            maxSize="35%"
+            collapsible
+            collapsedSize="0%"
+            className="shell__sidebar"
+          >
+            {sidebar}
+          </Panel>
+          <ResizeHandle direction="horizontal" className="sidebar-resize-handle" />
+          <Panel className="shell__main">
+            {main}
+          </Panel>
+        </PanelGroup>
+      </div>
 
       {/* Mobile bottom sheet for non-editor tabs */}
       {sheetOpen && activePanel && (

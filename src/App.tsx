@@ -21,6 +21,8 @@ import { ProgressDashboard } from './features/history/ProgressDashboard';
 import { AdviceSummary } from './features/advice/adviceSummary';
 import { AITeacherPanel } from './features/ai/AITeacherPanel';
 
+import { Panel, Group as PanelGroup } from 'react-resizable-panels';
+import { ResizeHandle } from './components/layout/ResizeHandle';
 import { ResponsiveShell } from './components/layout/ResponsiveShell';
 import type { TabId } from './components/layout/MobileTabs';
 import './styles/responsive.css';
@@ -47,15 +49,6 @@ function createWebAPICache(): WebAPICache {
   };
 }
 
-const tabBtnStyle = (active: boolean): React.CSSProperties => ({
-  padding: '3px 10px',
-  fontSize: 12,
-  background: active ? '#0e639c' : '#3c3c3c',
-  color: active ? '#fff' : '#ccc',
-  border: '1px solid #555',
-  borderRadius: 3,
-  cursor: 'pointer',
-});
 
 export default function App() {
   const [code, setCode] = useState(DEFAULT_CODE);
@@ -166,7 +159,7 @@ export default function App() {
     if (desktopTab === 'none') return null;
     if (desktopTab === 'advice') {
       return (
-        <div style={{ width: 360, background: '#252526', borderLeft: '1px solid #333', overflowY: 'auto' }}>
+        <div className="desktop-panel desktop-panel--narrow">
           <AdviceSummary />
         </div>
       );
@@ -175,7 +168,7 @@ export default function App() {
     const panel = panels[desktopTab as TabId];
     if (!panel) return null;
     return (
-      <div style={{ width: 400, background: '#252526', borderLeft: '1px solid #333', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+      <div className="desktop-panel">
         {panel.content}
       </div>
     );
@@ -184,30 +177,30 @@ export default function App() {
   // ─── Header ──────────────────────────────────────────────────────────────
   const header = (
     <>
-      <span style={{ fontWeight: 'bold', color: '#9cdcfe', fontSize: 15 }}>情報I インタプリタ</span>
+      <span className="brand">情報I</span>
       <ConsolePanel state={runState} />
-      <div style={{ marginLeft: 'auto', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-        <button style={tabBtnStyle(desktopTab === 'practice')} onClick={() => toggleDesktopTab('practice')}>練習</button>
-        <button style={tabBtnStyle(desktopTab === 'review')} onClick={() => toggleDesktopTab('review')}>復習</button>
-        <button style={tabBtnStyle(desktopTab === 'exam')} onClick={() => toggleDesktopTab('exam')}>テスト</button>
-        <button style={tabBtnStyle(desktopTab === 'history')} onClick={() => toggleDesktopTab('history')}>履歴</button>
-        <button style={tabBtnStyle(desktopTab === 'advice')} onClick={() => toggleDesktopTab('advice')}>アドバイス</button>
-        <button style={tabBtnStyle(desktopTab === 'ai')} onClick={() => toggleDesktopTab('ai')}>AI先生</button>
+      <nav className="header-tabs">
+        <button className={`tab-btn${desktopTab === 'practice' ? ' tab-btn--active' : ''}`} onClick={() => toggleDesktopTab('practice')}>練習</button>
+        <button className={`tab-btn${desktopTab === 'review' ? ' tab-btn--active' : ''}`} onClick={() => toggleDesktopTab('review')}>復習</button>
+        <button className={`tab-btn${desktopTab === 'exam' ? ' tab-btn--active' : ''}`} onClick={() => toggleDesktopTab('exam')}>テスト</button>
+        <button className={`tab-btn${desktopTab === 'history' ? ' tab-btn--active' : ''}`} onClick={() => toggleDesktopTab('history')}>履歴</button>
+        <button className={`tab-btn tab-btn--secondary${desktopTab === 'advice' ? ' tab-btn--active' : ''}`} onClick={() => toggleDesktopTab('advice')}>アドバイス</button>
+        <button className={`tab-btn${desktopTab === 'ai' ? ' tab-btn--active' : ''}`} onClick={() => toggleDesktopTab('ai')}>AI先生</button>
         <button
+          className={`tab-btn tab-btn--secondary${showDevice ? ' tab-btn--active' : ''}`}
           onClick={() => setShowDevice(v => !v)}
-          style={tabBtnStyle(showDevice)}
         >デバイス</button>
         <button
+          className={`tab-btn tab-btn--secondary${showNumericHint ? ' tab-btn--active' : ''}`}
           onClick={() => setShowNumericHint(v => !v)}
-          style={tabBtnStyle(showNumericHint)}
-        >数値ヒント</button>
-      </div>
+        >数値</button>
+      </nav>
     </>
   );
 
   // ─── Sidebar ─────────────────────────────────────────────────────────────
   const sidebar = (
-    <div style={{ padding: 12, display: 'flex', flexDirection: 'column', gap: 12 }}>
+    <div className="sidebar-content">
       <Toolbar
         samples={SAMPLES}
         selectedSample={selectedSample}
@@ -227,38 +220,52 @@ export default function App() {
   );
 
   // ─── Main area ────────────────────────────────────────────────────────────
-  const main = (
-    <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-      {/* Toolbar (desktop inline above editor) */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        {/* Mobile toolbar strip */}
-        <div className="mobile-only" style={{ padding: '4px 12px', background: '#252526', borderBottom: '1px solid #333' }}>
-          <Toolbar
-            samples={SAMPLES}
-            selectedSample={selectedSample}
-            onSelectSample={handleSelectSample}
-            onRun={handleRun}
-            onReset={handleReset}
-            runState={runState}
-          />
-        </div>
+  const editorColumnContent = (
+    <>
+      {/* Mobile toolbar strip */}
+      <div className="mobile-only mobile-toolbar-strip">
+        <Toolbar
+          samples={SAMPLES}
+          selectedSample={selectedSample}
+          onSelectSample={handleSelectSample}
+          onRun={handleRun}
+          onReset={handleReset}
+          runState={runState}
+        />
+      </div>
 
-        {/* Editor */}
-        <div style={{ flex: '0 0 55%' }}>
+      {/* Editor + Output: vertical resizable split */}
+      <PanelGroup orientation="vertical" className="editor-panel-group">
+        <Panel defaultSize="55%" minSize="20%" className="editor-wrap">
           <MonacoWorkbench code={code} onChange={setCode} height="100%" />
-        </div>
+        </Panel>
+        <ResizeHandle direction="vertical" />
+        <Panel defaultSize="45%" minSize="15%" className="output-wrap">
+          <div className="output-label">出力</div>
+          <div className="output-scroll">
+            <OutputPanel buffer={buffer} />
+          </div>
+        </Panel>
+      </PanelGroup>
+    </>
+  );
 
-        {/* Output */}
-        <div style={{ flex: 1, padding: 12, overflowY: 'auto', borderTop: '1px solid #333' }}>
-          <div style={{ color: '#888', fontSize: 11, marginBottom: 4 }}>出力</div>
-          <OutputPanel buffer={buffer} />
-        </div>
-      </div>
-
-      {/* Desktop feature panels */}
-      <div className="desktop-only">
-        <DesktopPanel />
-      </div>
+  const main = (
+    <div className="main-split">
+      {desktopTab === 'none' ? (
+        <div className="editor-column">{editorColumnContent}</div>
+      ) : (
+        /* Editor column + Desktop right panel: horizontal resizable split */
+        <PanelGroup orientation="horizontal" style={{ flex: 1 }}>
+          <Panel defaultSize="55%" minSize="25%" className="editor-column">
+            {editorColumnContent}
+          </Panel>
+          <ResizeHandle direction="horizontal" className="desktop-only" />
+          <Panel defaultSize="45%" minSize="20%" className="desktop-panel-wrap desktop-only">
+            <DesktopPanel />
+          </Panel>
+        </PanelGroup>
+      )}
     </div>
   );
 

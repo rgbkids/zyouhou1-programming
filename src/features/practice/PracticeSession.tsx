@@ -42,7 +42,6 @@ export function PracticeSession({ onClose }: { onClose: () => void }) {
   function start() {
     const problems = pickProblems(filter, new Set());
     if (problems.length === 0) return;
-    // Shuffle
     const shuffled = [...problems].sort(() => Math.random() - 0.5).slice(0, 5);
     setQueue(shuffled);
     setIdx(0);
@@ -55,13 +54,7 @@ export function PracticeSession({ onClose }: { onClose: () => void }) {
   function handleAnswer(correct: boolean, usedHint: boolean) {
     const problem = queue[idx];
     const durationMs = Date.now() - startTime.current;
-    recordAnswer({
-      problemId: problem.id,
-      topic: problem.topics[0],
-      correct,
-      durationMs,
-      usedHint,
-    });
+    recordAnswer({ problemId: problem.id, topic: problem.topics[0], correct, durationMs, usedHint });
     setScore(s => ({ correct: s.correct + (correct ? 1 : 0), total: s.total + 1 }));
     startTime.current = Date.now();
   }
@@ -74,64 +67,82 @@ export function PracticeSession({ onClose }: { onClose: () => void }) {
     }
   }
 
-  const btnStyle = { padding: '6px 14px', borderRadius: 4, border: 'none', cursor: 'pointer', background: '#0e639c', color: '#fff' };
-  const selectStyle = { padding: '4px 8px', background: '#3c3c3c', color: '#ccc', border: '1px solid #555', borderRadius: 4 };
-
+  // ── Start screen ──────────────────────────────────────────
   if (!started) {
     return (
-      <div style={{ padding: 24, maxWidth: 600 }}>
-        <h2 style={{ color: '#9cdcfe', marginTop: 0 }}>練習問題</h2>
-        <div style={{ marginBottom: 12 }}>
-          <label style={{ color: '#888', fontSize: 13 }}>難易度</label>
-          <br />
-          <select style={{ ...selectStyle, marginTop: 4 }} value={filter.difficulty ?? ''} onChange={e => setFilter(f => ({ ...f, difficulty: e.target.value as Difficulty || undefined }))}>
-            <option value="">すべて</option>
-            <option value="basic">基礎</option>
-            <option value="standard">標準</option>
-            <option value="advanced">応用</option>
-          </select>
+      <div className="panel">
+        <h2 className="panel-title">練習問題</h2>
+        <div className="card">
+          <div className="mb-12">
+            <div className="section-heading">難易度</div>
+            <select
+              className="select-field"
+              value={filter.difficulty ?? ''}
+              onChange={e => setFilter(f => ({ ...f, difficulty: e.target.value as Difficulty || undefined }))}
+            >
+              <option value="">すべて</option>
+              <option value="basic">基礎</option>
+              <option value="standard">標準</option>
+              <option value="advanced">応用</option>
+            </select>
+          </div>
+          <div>
+            <div className="section-heading">トピック</div>
+            <select
+              className="select-field"
+              value={filter.topic ?? ''}
+              onChange={e => setFilter(f => ({ ...f, topic: e.target.value as TopicTag || undefined }))}
+            >
+              <option value="">すべて</option>
+              {TOPICS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+            </select>
+          </div>
         </div>
-        <div style={{ marginBottom: 16 }}>
-          <label style={{ color: '#888', fontSize: 13 }}>トピック</label>
-          <br />
-          <select style={{ ...selectStyle, marginTop: 4 }} value={filter.topic ?? ''} onChange={e => setFilter(f => ({ ...f, topic: e.target.value as TopicTag || undefined }))}>
-            <option value="">すべて</option>
-            {TOPICS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-          </select>
-        </div>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button style={btnStyle} onClick={start}>開始する</button>
-          <button style={{ ...btnStyle, background: '#3c3c3c' }} onClick={onClose}>戻る</button>
+        <div className="flex-row mt-16">
+          <button className="btn btn-primary" onClick={start}>開始する</button>
+          <button className="btn btn-secondary" onClick={onClose}>戻る</button>
         </div>
       </div>
     );
   }
 
+  // ── Result screen ─────────────────────────────────────────
   if (done) {
     const pct = Math.round(score.correct / score.total * 100);
+    const cls = pct >= 80 ? 'good' : pct >= 50 ? 'mid' : 'bad';
     return (
-      <div style={{ padding: 24, maxWidth: 600 }}>
-        <h2 style={{ color: '#9cdcfe', marginTop: 0 }}>セッション完了</h2>
-        <div style={{ fontSize: 32, fontWeight: 'bold', color: pct >= 80 ? '#89d185' : pct >= 50 ? '#dcdcaa' : '#f48771', marginBottom: 8 }}>
-          {score.correct} / {score.total} 問正解 ({pct}%)
+      <div className="panel">
+        <h2 className="panel-title">セッション完了</h2>
+        <div className="card" style={{ textAlign: 'center', padding: '28px 20px' }}>
+          <div className={`score-display score-display--${cls}`}>
+            {score.correct} <span style={{ fontSize: '0.5em', opacity: 0.6 }}>/ {score.total}</span>
+          </div>
+          <div style={{ fontSize: 13, color: 'var(--text)', marginTop: 6 }}>
+            正解率 {pct}%
+          </div>
         </div>
-        <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
-          <button style={btnStyle} onClick={start}>もう一度</button>
-          <button style={{ ...btnStyle, background: '#3c3c3c' }} onClick={onClose}>終了</button>
+        <div className="flex-row mt-12">
+          <button className="btn btn-primary" onClick={start}>もう一度</button>
+          <button className="btn btn-secondary" onClick={onClose}>終了</button>
         </div>
       </div>
     );
   }
 
+  // ── In-progress screen ────────────────────────────────────
   const problem = queue[idx];
+  const progress = ((idx) / queue.length) * 100;
   return (
-    <div style={{ padding: 16, maxWidth: 680 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-        <span style={{ color: '#888', fontSize: 13 }}>問題 {idx + 1} / {queue.length}</span>
-        <button style={{ ...btnStyle, background: '#3c3c3c', fontSize: 12 }} onClick={onClose}>中断</button>
+    <div className="panel">
+      <div className="progress-bar">
+        <div className="progress-bar__fill" style={{ width: `${progress}%` }} />
+      </div>
+      <div className="session-header">
+        <span className="session-meta">問題 {idx + 1} / {queue.length}</span>
+        <button className="btn btn-secondary btn-sm" onClick={onClose}>中断</button>
       </div>
       <ProblemRenderer key={problem.id} problem={problem} onAnswer={handleAnswer} />
-      <button style={{ ...btnStyle, marginTop: 8 }} onClick={next}>
+      <button className="btn btn-primary mt-8" onClick={next}>
         {idx + 1 >= queue.length ? '結果を見る' : '次の問題へ →'}
       </button>
     </div>
