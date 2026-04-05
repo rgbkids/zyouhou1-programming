@@ -1,0 +1,6 @@
+temp = device.temperature()
+if temp > 25:
+    device.led_show("HOT")
+else:
+    device.led_show("OK")
+print(temp)

@@ -1,0 +1,11 @@
+items = [3, 6, 9, 12, 15, 18, 21]
+left = 0
+right = 6
+mid = 3
+if items[mid] < 15:
+    left = mid + 1
+mid = 5
+if items[mid] > 15:
+    right = mid - 1
+mid = 4
+print(mid)
