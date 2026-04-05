@@ -1,0 +1,21 @@
+# モデル化とシミュレーション: サイコロ試行
+
+print("=== サイコロシミュレーション ===")
+n = 600  # 試行回数
+
+counts = [0, 0, 0, 0, 0, 0]  # 1〜6の出現回数
+
+for i in range(0, n, 1):
+    dice = random.randrange(1, 7)
+    counts[dice - 1] = counts[dice - 1] + 1
+
+print("試行回数:", n)
+print("")
+print("目  | 回数  | 割合")
+print("----+-------+------")
+for i in range(0, 6, 1):
+    ratio = counts[i] / n
+    print(i + 1, "   |", counts[i], "    |", int(ratio * 100), "%")
+
+print("")
+print("理論値: 各目", int(n / 6), "回（約 16.7%）")

@@ -1,0 +1,21 @@
+# 確率試行: コイン投げ（大数の法則）
+
+def coin_trial(n):
+    heads = 0
+    for i in range(0, n, 1):
+        result = random.randrange(0, 2)  # 0=裏, 1=表
+        if result == 1:
+            heads = heads + 1
+    return heads
+
+print("=== コイン投げ試行 ===")
+print("試行回数 | 表の回数 | 表の割合")
+print("---------+---------+---------")
+
+for n in [10, 50, 100, 500, 1000]:
+    h = coin_trial(n)
+    ratio = int(h / n * 100)
+    print(n, "      |", h, "     |", ratio, "%")
+
+print("")
+print("【考察】試行回数を増やすと割合が 50% に近づく（大数の法則）")

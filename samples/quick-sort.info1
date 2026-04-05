@@ -1,0 +1,32 @@
+# クイックソート（Quick Sort）
+# ピボットを使って分割統治で整列する
+
+def quick_sort(lst, left, right):
+    if left >= right:
+        return
+    pivot = lst[(left + right) // 2]
+    i = left
+    j = right
+    while i <= j:
+        while lst[i] < pivot:
+            i = i + 1
+        while lst[j] > pivot:
+            j = j - 1
+        if i <= j:
+            tmp = lst[i]
+            lst[i] = lst[j]
+            lst[j] = tmp
+            i = i + 1
+            j = j - 1
+    quick_sort(lst, left, j)
+    quick_sort(lst, i, right)
+
+data = [5, 3, 8, 1, 9, 2, 7, 4, 6]
+print("ソート前:", data)
+quick_sort(data, 0, len(data) - 1)
+print("ソート後:", data)
+
+print("")
+print("【選択ソートとの比較】")
+print("選択ソート: 常に O(n²) の比較")
+print("クイックソート: 平均 O(n log n)、最悪 O(n²)")

@@ -1,0 +1,28 @@
+# 選択ソート（Selection Sort）
+# 最小値を選んで先頭と交換する操作を繰り返す
+
+def selection_sort(lst):
+    n = len(lst)
+    swaps = 0
+    for i in range(0, n - 1, 1):
+        min_idx = i
+        # i+1 以降で最小値のインデックスを探す
+        for j in range(i + 1, n, 1):
+            if lst[j] < lst[min_idx]:
+                min_idx = j
+        # 最小値を先頭（i番目）と交換
+        if min_idx != i:
+            tmp = lst[i]
+            lst[i] = lst[min_idx]
+            lst[min_idx] = tmp
+            swaps = swaps + 1
+            print("  交換:", lst)
+    print("交換回数:", swaps)
+    return lst
+
+data = [5, 3, 8, 1, 9, 2, 7, 4, 6]
+print("ソート前:", data)
+print("")
+result = selection_sort(data)
+print("")
+print("ソート後:", result)

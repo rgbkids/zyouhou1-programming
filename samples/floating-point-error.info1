@@ -1,0 +1,31 @@
+# 計算誤差: 浮動小数点数の誤差デモ
+
+print("=== 誤差が出る例 ===")
+a = 0.28
+b = 0.27
+result = a - b
+print("0.28 - 0.27 =", result)
+print("0.01 と等しい？", result == 0.01)
+
+print("")
+print("=== その他の例 ===")
+print("0.1 + 0.2 =", 0.1 + 0.2)
+print("期待値: 0.3")
+
+print("")
+print("=== 整数化による回避 ===")
+# 100 倍して整数で計算し、最後に 100 で割る
+a2 = 28
+b2 = 27
+result2 = (a2 - b2) / 100
+print("(28 - 27) / 100 =", result2)
+print("0.01 と等しい？", result2 == 0.01)
+
+print("")
+print("=== 別の回避策: round() の代わりに整数で管理 ===")
+# 金額計算では整数（円）で管理するのが定石
+price_yen = 280
+discount_yen = 270
+diff_yen = price_yen - discount_yen
+print("差額:", diff_yen, "円")
+print("小数表記:", diff_yen / 100, "円")

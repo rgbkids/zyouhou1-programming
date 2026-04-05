@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(list\\(d.get\\('packages',{}\\).keys\\(\\)\\)[:50]\\)\")",
+      "Bash(python3 -c \"import sys,json;d=json.load\\(sys.stdin\\);print\\(d.get\\('version'\\)\\)\")",
+      "Bash(npm run:*)",
+      "Bash(pnpm dev:*)",
+      "Bash(brew list:*)",
+      "Read(//usr/local/bin/**)",
+      "Read(//opt/homebrew/**)",
+      "Bash(fnm list:*)",
+      "Bash(fnm use:*)",
+      "Bash(fnm which:*)",
+      "Read(//Users/myuser/.fnm/node-versions/v22.14.0/installation/bin/**)",
+      "Read(//Users/myuser/**)",
+      "Bash(export PATH=\"$NODE22:$PATH\")"
+    ]
+  }
+}

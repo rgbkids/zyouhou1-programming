@@ -1,0 +1,25 @@
+# 線形探索（Linear Search）
+# リストを先頭から順番に調べる
+
+def linear_search(lst, target):
+    count = 0
+    for i in range(0, len(lst), 1):
+        count = count + 1
+        print("  確認中: インデックス", i, "の値", lst[i])
+        if lst[i] == target:
+            print("見つかりました！ インデックス:", i)
+            print("比較回数:", count)
+            return i
+    print("見つかりませんでした。比較回数:", count)
+    return -1
+
+data = [5, 3, 8, 1, 9, 2, 7, 4, 6]
+print("データ:", data)
+print("")
+
+print("=== 9 を探す ===")
+linear_search(data, 9)
+
+print("")
+print("=== 99 を探す（存在しない）===")
+linear_search(data, 99)

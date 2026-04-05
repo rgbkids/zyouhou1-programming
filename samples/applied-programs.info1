@@ -1,0 +1,42 @@
+# 応用的プログラム: リスト・乱数・関数
+
+# ── リスト ────────────────────────────────
+print("=== リスト ===")
+scores = [80, 90, 70, 85, 95]
+print("点数一覧:", scores)
+print("件数:", len(scores))
+
+total = 0
+for i in range(0, len(scores), 1):
+    total = total + scores[i]
+print("合計:", total)
+print("平均:", total / len(scores))
+
+# ── リスト関数 ────────────────────────────
+print("")
+print("=== 関数: リスト合計 ===")
+def list_sum(lst):
+    s = 0
+    for i in range(0, len(lst), 1):
+        s = s + lst[i]
+    return s
+
+print("合計:", list_sum(scores))
+
+# ── 乱数 ──────────────────────────────────
+print("")
+print("=== 乱数: サイコロ10回 ===")
+for i in range(0, 10, 1):
+    d = random.randrange(1, 7)
+    print("第", i + 1, "投:", d)
+
+# ── 関数の再帰 ────────────────────────────
+print("")
+print("=== 再帰関数: 階乗 ===")
+def factorial(n):
+    if n <= 1:
+        return 1
+    return n * factorial(n - 1)
+
+for i in range(1, 8, 1):
+    print(i, "! =", factorial(i))

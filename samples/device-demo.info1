@@ -1,0 +1,40 @@
+# 外部装置との接続（模擬）: デバイスシミュレータ
+# 左のパネルのスライダーを動かしてから実行してください
+
+print("=== センサ読み取り ===")
+x = device.accelerometer_x()
+y = device.accelerometer_y()
+t = device.temperature()
+light = device.light_level()
+
+print("加速度 X:", x)
+print("加速度 Y:", y)
+print("温度:", t, "°C")
+print("照度:", light)
+
+print("")
+print("=== LED 制御 ===")
+if x > 500:
+    device.led_show("→")
+    print("右に傾いています →")
+elif x < -500:
+    device.led_show("←")
+    print("左に傾いています ←")
+else:
+    device.led_show("OK")
+    print("水平に近い状態")
+
+print("")
+print("=== 温度に応じた判定 ===")
+if t > 30:
+    print("暑い！冷房をつけましょう")
+elif t > 20:
+    print("快適な温度です")
+elif t > 10:
+    print("少し涼しいです")
+else:
+    print("寒い！暖房をつけましょう")
+
+device.led_clear()
+print("")
+print("LED クリア完了")
