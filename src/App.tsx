@@ -39,7 +39,7 @@ for i in range(5):
 `;
 
 // Desktop panel tabs
-type DesktopTab = 'none' | 'practice' | 'review' | 'exam' | 'history' | 'advice' | 'ai';
+type DesktopTab = 'none' | 'practice' | 'review' | 'exam' | 'history' | 'advice';
 
 function createWebAPICache(): WebAPICache {
   const map = new Map<string, string>();
@@ -142,15 +142,6 @@ export default function App() {
         title: '学習履歴',
         content: <ProgressDashboard />,
       },
-      ai: {
-        title: 'AI先生',
-        content: (
-          <AITeacherPanel
-            currentCode={code}
-            lastError={lastError}
-          />
-        ),
-      },
     };
   }
 
@@ -185,7 +176,6 @@ export default function App() {
         <button className={`tab-btn${desktopTab === 'exam' ? ' tab-btn--active' : ''}`} onClick={() => toggleDesktopTab('exam')}>テスト</button>
         <button className={`tab-btn${desktopTab === 'history' ? ' tab-btn--active' : ''}`} onClick={() => toggleDesktopTab('history')}>履歴</button>
         <button className={`tab-btn tab-btn--secondary${desktopTab === 'advice' ? ' tab-btn--active' : ''}`} onClick={() => toggleDesktopTab('advice')}>アドバイス</button>
-        <button className={`tab-btn${desktopTab === 'ai' ? ' tab-btn--active' : ''}`} onClick={() => toggleDesktopTab('ai')}>AI先生</button>
         <button
           className={`tab-btn tab-btn--secondary${showDevice ? ' tab-btn--active' : ''}`}
           onClick={() => setShowDevice(v => !v)}
@@ -255,7 +245,6 @@ export default function App() {
       {desktopTab === 'none' ? (
         <div className="editor-column">{editorColumnContent}</div>
       ) : (
-        /* Editor column + Desktop right panel: horizontal resizable split */
         <PanelGroup orientation="horizontal" style={{ flex: 1 }}>
           <Panel defaultSize="55%" minSize="25%" className="editor-column">
             {editorColumnContent}
@@ -270,11 +259,14 @@ export default function App() {
   );
 
   return (
-    <ResponsiveShell
-      header={header}
-      sidebar={sidebar}
-      main={main}
-      panels={makePanels()}
-    />
+    <>
+      <ResponsiveShell
+        header={header}
+        sidebar={sidebar}
+        main={main}
+        panels={makePanels()}
+      />
+      <AITeacherPanel currentCode={code} lastError={lastError} />
+    </>
   );
 }
