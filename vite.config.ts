@@ -9,8 +9,8 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          monaco: ["monaco-editor"],
+        manualChunks: (id) => {
+          if (id.includes("monaco-editor")) return "monaco";
         },
       },
     },
