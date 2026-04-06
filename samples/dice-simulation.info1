@@ -1,0 +1,22 @@
+# サイコロシミュレーション (Monte Carlo Simulation)
+# 乱数と反復で確率を実験的に確かめる
+
+import random
+
+trials = 600
+counts = [0, 0, 0, 0, 0, 0]
+
+for i in range(trials):
+    d = random.randrange(1, 7)
+    counts[d - 1] = counts[d - 1] + 1
+
+print("さいころ", trials, "回の結果:")
+for i in range(6):
+    ratio = counts[i] / trials
+    bar = ""
+    for j in range(int(ratio * 40)):
+        bar = bar + "#"
+    print(str(i + 1) + "の目:", counts[i], "回", "(" + str(int(ratio * 100)) + "%)", bar)
+
+print("")
+print("理論値: 各目 約", trials // 6, "回 (16~17%)")

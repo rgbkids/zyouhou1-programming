@@ -1,0 +1,24 @@
+# 選択ソート (Selection Sort)
+# 最小値を選んで先頭から並べる
+
+def selection_sort(a):
+    n = len(a)
+    swaps = 0
+    for i in range(n):
+        min_idx = i
+        for j in range(i + 1, n):
+            if a[j] < a[min_idx]:
+                min_idx = j
+        if min_idx != i:
+            tmp = a[i]
+            a[i] = a[min_idx]
+            a[min_idx] = tmp
+            swaps = swaps + 1
+        print("ステップ", i + 1, ":", a)
+    return swaps
+
+data = [64, 25, 12, 22, 11]
+print("ソート前:", data)
+swaps = selection_sort(data)
+print("ソート後:", data)
+print("交換回数:", swaps)

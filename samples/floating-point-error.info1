@@ -1,0 +1,24 @@
+# 浮動小数点誤差 (Floating Point Error)
+# コンピュータの小数表現には限界がある
+
+print("=== 浮動小数点誤差の例 ===")
+a = 0.28
+b = 0.27
+print("0.28 - 0.27 =", a - b)
+print("期待値 0.01 と一致? ", a - b == 0.01)
+
+print("")
+print("=== 整数化による回避 ===")
+a_int = 28
+b_int = 27
+result = (a_int - b_int) / 100
+print("整数で計算してから変換:", result)
+print("一致? ", result == 0.01)
+
+print("")
+print("=== 誤差が積み重なる例 ===")
+total = 0.0
+for i in range(10):
+    total = total + 0.1
+print("0.1 を 10 回足した結果:", total)
+print("期待値 1.0 と一致? ", total == 1.0)

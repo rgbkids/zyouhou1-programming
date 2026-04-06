@@ -1,0 +1,25 @@
+# 二分探索 (Binary Search)
+# ソート済みリストを半分に絞りながら探す
+
+def binary_search(a, target):
+    left = 0
+    right = len(a) - 1
+    count = 0
+    while left <= right:
+        count = count + 1
+        mid = (left + right) // 2
+        if a[mid] == target:
+            print("見つかった: インデックス", mid, "（比較回数:", count, "）")
+            return mid
+        elif a[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+    print("見つからなかった（比較回数:", count, "）")
+    return -1
+
+data = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+print("データ:", data)
+binary_search(data, 7)
+binary_search(data, 10)
+print("線形探索との比較: 9要素で最大9回 vs 最大4回")

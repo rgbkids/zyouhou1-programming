@@ -1,0 +1,25 @@
+# クイックソート (Quick Sort)
+# ピボットを使って再帰的に分割する
+
+def quick_sort(a, low, high):
+    if low < high:
+        pivot = a[high]
+        i = low - 1
+        for j in range(low, high):
+            if a[j] <= pivot:
+                i = i + 1
+                tmp = a[i]
+                a[i] = a[j]
+                a[j] = tmp
+        tmp = a[i + 1]
+        a[i + 1] = a[high]
+        a[high] = tmp
+        pi = i + 1
+        quick_sort(a, low, pi - 1)
+        quick_sort(a, pi + 1, high)
+
+data = [64, 25, 12, 22, 11]
+print("ソート前:", data)
+quick_sort(data, 0, len(data) - 1)
+print("ソート後:", data)
+print("選択ソートとの違い: ピボット分割で平均 O(n log n)")

@@ -1,0 +1,36 @@
+# デバイス模擬 (Device Simulation)
+# センサ値を読み取ってアクチュエータを制御する
+
+print("=== 加速度センサ ===")
+x = device.accelerometer_x()
+print("加速度X:", x)
+
+if x > 200:
+    device.led_show("R")
+    print("右に傾いています → LED: R")
+elif x < -200:
+    device.led_show("L")
+    print("左に傾いています → LED: L")
+else:
+    device.led_show("O")
+    print("ほぼ水平です → LED: O")
+
+print("")
+print("=== 温度センサ ===")
+t = device.temperature()
+print("温度:", t, "℃")
+if t >= 30:
+    print("暑い！")
+elif t >= 20:
+    print("快適")
+else:
+    print("寒い")
+
+print("")
+print("=== 照度センサ ===")
+light = device.light_level()
+print("照度:", light)
+if light > 200:
+    print("明るい環境")
+else:
+    print("暗い環境")
