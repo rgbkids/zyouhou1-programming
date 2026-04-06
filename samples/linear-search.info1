@@ -1,0 +1,7 @@
+items = [4, 8, 15, 16]
+target = 15
+index = -1
+for i in range(0, 4, 1):
+    if items[i] == target:
+        index = i
+print(index)

@@ -1,0 +1,5 @@
+nums = [3, 5, 8]
+def total(items):
+    return items[0] + items[1] + items[2]
+print(len(nums))
+print(total(nums))
